@@ -1,6 +1,6 @@
 # Codebook
 
-This set of functions uses regular expressions to isolate keywords from cases downloaded from Westlaw. It is not 100% reliable: the document structure tends to waver, especially with regard to older cases. As a result, quite a bit of manual post-processing is required.
+This set of functions uses regular expressions to isolate keywords from cases downloaded from Westlaw. It is not 100% reliable: the document structure tends to waver, especially with regard to older cases. As a result, quite a bit of manual post-processing is required (see the third section below).
 
 ## Working from Westlaw
 
@@ -57,7 +57,7 @@ e0 <- seq(2, length(separator), by=2)
 sep_end <- separator[e0]
 ```
 
-I then set up an empty matrix that I will fill with the data, consisting of a number of rows corresponding to the number of cases and five columns, into which I will place (1) the Case name; (2) the date; (3) the case code; (4) the court; and (5) the sentence containing they keyword.
+I then set up an empty matrix that I will fill with the data, consisting of a number of rows corresponding to the number of cases and five columns, into which I will place (1) the Case name; (2) the date; (3) the case code; (4) the court; and (5) the sentence containing the keyword (text).
 
 ```{r, create_matrix, eval=FALSE}
 full_cases.m <- matrix(nrow = length(sep_begin), ncol = 5)
@@ -180,3 +180,9 @@ The full functions are here:
 - [Westlaw Cases Function](https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R).
 
 - [Isolate Keyword](https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R).
+
+## Post-processing
+
+- Using regular expressions brings mixed results and as a result the dataset had to be manually amended and fixed, especially when it comes to older cases.
+- I then removed all duplicate phrases, leaving the earliest one in place.
+- I then coded two new columns, where each sentence would score a 1 either for 'unaccountable as unintelligible' or 'unaccountable as _not_-accountable'
