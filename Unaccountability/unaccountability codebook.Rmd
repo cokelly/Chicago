@@ -31,15 +31,15 @@ for(i in txt_files) {
 
 Please ensure that the following function are in your working directory:
 
-[https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R](Westlaw Cases Function.R): a function that loops through westlaw cases and constructs a dataframe with metadata and a sentence containing a nominated keyword
+[Westlaw Cases Function.R](https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R): a function that loops through westlaw cases and constructs a dataframe with metadata and a sentence containing a nominated keyword
 
 and the function it calls:
 
-[https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R](IsolateKey.R): a function for isolating the keyword
+[IsolateKey.R](https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R): a function for isolating the keyword
 
 ##westlaw_cases
 
-This function separates each file by assuming the cases to be divided by a line containing the following text: "© 2015 Sweet & Maxwell" 
+This function separates each file by assuming the cases to be divided by a line containing the following text: "© 2015 Sweet & Maxwell"
 
 ```{r, separator, eval=FALSE}
 separator <- which(x == "© 2015 Sweet & Maxwell")
@@ -89,7 +89,7 @@ Then I isolate the date, the case codes and the courts by searching for months a
 
 ```{r, find_dates, eval=FALSE}
 months <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
- 
+
 for(q in 1:12){
      m <- grep(months[q], top)
      if(length(m) > 0){
@@ -112,27 +112,27 @@ I then run the "IsolateKey" function and that finishes the loop.
 
 ```{r, isolate_key, eval=FALSE}
 isolatekey <- function(a, key){
-      
+
       collapsed0 <- strsplit(a, " ")
       collapsed <- unlist(collapsed0)
-      
+
       #Isolated the keyword and fullstops
-      
+
       unacc <- grep("unaccountable", collapsed)
       fullstops <- grep("\\.", collapsed)
-      
+
       # Now isolate the relevant sentence
       if(length(unacc) == 1){
             end00 <- which(fullstops >= unacc)
             end0 <- fullstops[end00]
             end <- end0[1]
-            
+
             start00 <- which(fullstops < unacc)
             start0 <- fullstops[start00]
             start <- start0[length(start0)]+1
-            
+
             sentence <- collapsed[start:end]
-            
+
             sentence <- paste(sentence, collapse = " ")
       } else {
             if(length(unacc) > 1)
@@ -142,21 +142,21 @@ isolatekey <- function(a, key){
                         end00 <- which(fullstops >= unacc[i])
                         end0 <- fullstops[end00]
                         end <- end0[1]
-                        
+
                         start00 <- which(fullstops < unacc[i])
                         start0 <- fullstops[start00]
                         start <- start0[length(start0)]+1
-                        
+
                         sentence0 <- collapsed[start:end]
-                        
-                        sentence0 <- paste(sentence0, collapse = " ")     
+
+                        sentence0 <- paste(sentence0, collapse = " ")
                         sentence <- c(d, sentence0)
-                        
+
                   }
             }
       }
-      return(sentence)   
-      
+      return(sentence)
+
 }
 ```
 
@@ -177,6 +177,6 @@ y[,1] <- gsub('\\*[[:digit:]]+', '', y[,1])
 
 The full functions are here:
 
-[https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R](Westlaw Cases Function)
+[Westlaw Cases Function](https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R)
 
-Isolate Key
+[Isolate Keyword](https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R): a
