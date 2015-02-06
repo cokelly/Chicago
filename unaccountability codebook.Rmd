@@ -1,0 +1,182 @@
+# Codebook
+
+This set of functions uses regular expressions to isolate keywords from cases downloaded from Westlaw. It is not 100% reliable: the document structure tends to waver, especially with regard to older cases. As a result, quite a bit of manual post-processing is required.
+
+## Working from Westlaw
+
+- I downloaded all **cases** from Westlaw that contained the keyword 'unaccountable'
+- 347 results (February 6 2015)
+- All results were downloaded (in groups of 40) as 'rtf' documents (of about 1,000 pages each)
+- Saved as 'txt' files
+- Placed in a single directory.
+
+I used the following code to change the filenames to something more manageable and then to upload all files into [R](http://www.r-project.org/)
+
+```{r, load, eval=FALSE}
+txt_files <- list.files(pattern="*.txt")
+
+x <- length(txt_files)
+
+files2 <- file.rename(list.files(pattern="*.txt"), paste0("file_", 1:x, ".txt"))
+
+txt_files <- list.files(pattern="*.txt")
+
+for(i in txt_files) {
+      x <- scan(i, what="character", sep="\n")
+      assign(i,x)  
+}
+```
+
+## Processing the data
+
+Please ensure that the following function are in your working directory:
+
+**Westlaw Cases Function.R**: a function that loops through westlaw cases and constructs a dataframe with metadata and a sentence containing a nominated keyword
+
+and the function it calls:
+
+**IsolateKey.R**: a function for isolating the keyword
+
+##westlaw_cases
+
+This function separates each file by assuming the cases to be divided by a line containing the following text: "© 2015 Sweet & Maxwell" 
+
+```{r, separator, eval=FALSE}
+separator <- which(x == "© 2015 Sweet & Maxwell")
+```
+
+I then exclude metadata by sifting the 'separator' vector into odd and even locations. The case body will be contained, for instance, between location 1 (at the end of the metadata for the first case) and location 2 (at the next marker)
+
+```{r, sift_markers, eval=FALSE}
+# odd separator markers (beginning of cases)
+o0 <- seq(1, length(separator), by=2)
+sep_begin <- separator[o0]
+
+# even separator markers (end of cases)
+e0 <- seq(2, length(separator), by=2)
+sep_end <- separator[e0]
+```
+
+I then set up an empty matrix that I will fill with the data, consisting of a number of rows corresponding to the number of cases and five columns, into which I will place (1) the Case name; (2) the date; (3) the case code; (4) the court; and (5) the sentence containing they keyword.
+
+```{r, create_matrix, eval=FALSE}
+full_cases.m <- matrix(nrow = length(sep_begin), ncol = 5)
+```
+
+Then I begin the loop by isolating the case name. I search the first 8 lines for a 'v'. If I do not find one I take the first line. If I find multiple instances, I take the first one.
+
+```{r, case_names, eval=FALSE}
+a <- x[(sep_begin[i]+1):(sep_end[i]-1)]
+      top <- a[1:8]
+      # assume there's a "v" in the name
+      name0 <- grep(" v ", top)
+      if(length(name0) == 1){
+      full_cases.m[i,1] <- top[name0]
+      } else {
+      # if not, take the first line
+            if(length(name0) == 0){
+                  full_cases.m[i,1] <- top[1]
+      # if there are more than one lines with "v" in the first ten lines, choose the first one
+            } else {
+                  if(length(name0) > 1){
+                        full_cases.m[i,1] <- name0[1]
+                  }
+            }
+            }
+```
+
+Then I isolate the date, the case codes and the courts by searching for months and then importing that line (for date), the line below (for code) and the line above (for court):
+
+```{r, find_dates, eval=FALSE}
+months <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+ 
+for(q in 1:12){
+     m <- grep(months[q], top)
+     if(length(m) > 0){
+           #code <- m-1
+           #import dates
+           full_cases.m[i,2] <- top[m[1]]
+           #import codes
+           full_cases.m[i,3] <- top[(m[1])+1]
+           #import court
+           if(length(top[(m[1])-1]) > 0){
+           full_cases.m[i,4] <- top[(m[1])-1]
+           } else {
+                full_cases.m[i,4] = NA
+           }
+     }
+}
+```
+
+I then run the "IsolateKey" function and that finishes the loop.
+
+```{r, isolate_key, eval=FALSE}
+isolatekey <- function(a, key){
+      
+      collapsed0 <- strsplit(a, " ")
+      collapsed <- unlist(collapsed0)
+      
+      #Isolated the keyword and fullstops
+      
+      unacc <- grep("unaccountable", collapsed)
+      fullstops <- grep("\\.", collapsed)
+      
+      # Now isolate the relevant sentence
+      if(length(unacc) == 1){
+            end00 <- which(fullstops >= unacc)
+            end0 <- fullstops[end00]
+            end <- end0[1]
+            
+            start00 <- which(fullstops < unacc)
+            start0 <- fullstops[start00]
+            start <- start0[length(start0)]+1
+            
+            sentence <- collapsed[start:end]
+            
+            sentence <- paste(sentence, collapse = " ")
+      } else {
+            if(length(unacc) > 1)
+            {
+                  d = NULL
+                  for(i in 1:length(unacc)){
+                        end00 <- which(fullstops >= unacc[i])
+                        end0 <- fullstops[end00]
+                        end <- end0[1]
+                        
+                        start00 <- which(fullstops < unacc[i])
+                        start0 <- fullstops[start00]
+                        start <- start0[length(start0)]+1
+                        
+                        sentence0 <- collapsed[start:end]
+                        
+                        sentence0 <- paste(sentence0, collapse = " ")     
+                        sentence <- c(d, sentence0)
+                        
+                  }
+            }
+      }
+      return(sentence)   
+      
+}
+```
+
+Finally, I convert the matrix into a data frame, remove any leading page numbers from the case names and format the date column as dates.
+
+```{r, final_steps, eval=FALSE}
+y <- as.data.frame(full_cases.m)
+
+# Proper column names
+colnames(y) <- c("Case", "Date", "Code", "Court", "Body")
+
+#Format date
+y$Date <- as.Date(y$Date, format="%d %B %Y")
+
+#Remove leading page numbers
+y[,1] <- gsub('\\*[[:digit:]]+', '', y[,1])
+```
+
+The full functions are here:
+
+Westlaw Cases
+
+Isolate Key
