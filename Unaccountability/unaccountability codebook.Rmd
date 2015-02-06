@@ -31,11 +31,11 @@ for(i in txt_files) {
 
 Please ensure that the following function are in your working directory:
 
-**Westlaw Cases Function.R**: a function that loops through westlaw cases and constructs a dataframe with metadata and a sentence containing a nominated keyword
+[https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R](Westlaw Cases Function.R): a function that loops through westlaw cases and constructs a dataframe with metadata and a sentence containing a nominated keyword
 
 and the function it calls:
 
-**IsolateKey.R**: a function for isolating the keyword
+[https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R](IsolateKey.R): a function for isolating the keyword
 
 ##westlaw_cases
 
@@ -177,6 +177,6 @@ y[,1] <- gsub('\\*[[:digit:]]+', '', y[,1])
 
 The full functions are here:
 
-Westlaw Cases
+[https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R](Westlaw Cases Function)
 
 Isolate Key

@@ -5,7 +5,7 @@ isolatekey <- function(a, key){
       
       #Isolated the keyword and fullstops
       
-      unacc <- grep("unaccountable", collapsed)
+      unacc <- grep(key, collapsed)
       fullstops <- grep("\\.", collapsed)
       
       # Now isolate the relevant sentence
