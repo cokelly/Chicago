@@ -177,6 +177,6 @@ y[,1] <- gsub('\\*[[:digit:]]+', '', y[,1])
 
 The full functions are here:
 
-[Westlaw Cases Function](https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R)
+- [Westlaw Cases Function](https://github.com/cokelly/Chicago/blob/master/Unaccountability/Westlaw%20Cases%20Function.R).
 
-[Isolate Keyword](https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R): a
+- [Isolate Keyword](https://github.com/cokelly/Chicago/blob/master/Unaccountability/IsolateKey.R).
