@@ -114,7 +114,13 @@ sentence <- isolatekey(a, key)
 
 y <- as.data.frame(full_cases.m)
 
-y[,1] <- gsub('\\*[[:digit:]]+', '', y[,1])
+# Proper column names
+colnames(y) <- c("Case", "Date", "Code", "Court", "Body")
 
+#Format date
+y$Date <- as.Date(y$Date, format="%d %B %Y")
+
+#Remove leading page numbers
+y[,1] <- gsub('\\*[[:digit:]]+', '', y[,1])
 
 return(y)}
