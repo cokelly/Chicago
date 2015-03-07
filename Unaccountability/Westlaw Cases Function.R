@@ -1,23 +1,30 @@
 # Formula to isolate cases by copyright sign, and to ditch the metadata at the start, then create a dataframe with case name, code, date and body
 
 westlaw_cases <- function(x, key){
+# The copyright notice below acts as the separator between cases in a Westlaw cases txt file
       
 separator <- which(x == "© 2015 Sweet & Maxwell")
 
-# odd separator markers (beginning of cases)
+# isolate odd separator markers (beginning of cases)
 o0 <- seq(1, length(separator), by=2)
 sep_begin <- separator[o0]
 
-# even separator markers (end of cases)
+# isolate even separator markers (end of cases)
 e0 <- seq(2, length(separator), by=2)
 sep_end <- separator[e0]
 
+#create an empty container matrix
+
 full_cases.m <- matrix(nrow = length(sep_begin), ncol = 5)
 
-# isolate on a case-by-case basis
+# work through the dataset using the information isolated above in order to isolate on a case-by-case basis
 for(i in 1:length(sep_begin)){
       
-      # start by isolating the case name
+      # Start by isolating the case name
+      # This is complicated by the fact that the case name is placed inconsistently in different places across cases. So I work through a series of assumptions
+      # 1. That there is a ' v ' in the line (as in "Eden v Foster")
+      # 2. If there is nothing with that character (as in "re Duomatic"), then take the first line
+      # 3. If there are more than one lines with ' v ' in the line, then take the first one.
       
       a <- x[(sep_begin[i]+1):(sep_end[i]-1)]
       top <- a[1:8]
@@ -39,6 +46,10 @@ for(i in 1:length(sep_begin)){
       
       
       # Now the dates, court and code
+      # 1. Find a line with a month name in the first 12 lines
+      # 2 Take the following line as the case code (that's where they usually are)
+      # 3. Take the line before as the court (Chancery etc)
+      # If there is nothing there (the date line was at the top), then return an NA
       
 months <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
       
@@ -58,7 +69,7 @@ for(q in 1:12){
            }
      }
 }
-      
+      # I'm going to have to change this to get 50 words on each side of the key word.
 isolatekey <- function(a, key){
 
       collapsed0 <- strsplit(a, " ")

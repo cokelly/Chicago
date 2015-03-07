@@ -1,3 +1,6 @@
+# The key is the word you want to isolate.
+# This function is contained within the Westlaw Cases Function
+
 isolatekey <- function(a, key){
       
       collapsed0 <- strsplit(a, " ")
