@@ -7,11 +7,11 @@ separator <- which(x == "© 2015 Sweet & Maxwell")
 
 # isolate odd separator markers (beginning of cases)
 o0 <- seq(1, length(separator), by=2)
-sep_begin <- separator[o0]
+sep_odd <- separator[o0]
 
 # isolate even separator markers (end of cases)
 e0 <- seq(2, length(separator), by=2)
-sep_end <- separator[e0]
+sep_even <- separator[e0]
 
 #create an empty container matrix
 
